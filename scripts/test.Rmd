@@ -1,0 +1,101 @@
+---
+title: "testing"
+author: "Alejandra Garcia Isaza"
+date: "5/5/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(rio)
+library(here)
+library(tidyverse)
+library(haven)
+library(janitor)
+library(surveytoolbox)
+library(sjPlot)
+library(psych)
+library(sjmisc)
+
+theme_set(theme_minimal())
+```
+
+# Loading the dataset
+```{r}
+process <- read_sav(here("data", "34398-0001-Data.sav"))
+
+parenting_bl_fu <- read_sav(here("data", "34398-0002-Data.sav")) 
+
+parenting_bl_fu %>%
+  arrange(PAB_STNU)
+
+preg_bl <- read_sav(here("data", "34398-0003-Data.sav"))
+data.frame(table(preg_bl$PRB_RTID)) # no dupes
+
+preg_bl %>%
+  arrange(PRB_STNU)
+
+preg_fu <- read_sav(here("data", "34398-0004-Data.sav"))
+preg_fu %>%
+  arrange(PRB_STNU)
+```
+
+```{r}
+preg_fu_1 <- preg_fu %>%
+  filter(FU_FOLLOWUP == 1)
+```
+
+```{r}
+preg_fu_2 <-  preg_fu %>%
+  filter(FU_FOLLOWUP == 2)
+```
+
+```{r}
+preg_fu1_fu2 <- right_join(preg_fu_1, preg_fu_2, by = "PRB_RTID", "PRB_STNU")
+```
+
+```{r}
+preg_fu1_fu2 %>%
+  arrange(PRB_RTID)
+```
+
+#right_join
+```{r}
+preg_bl_fu1_fu2 <- right_join(preg_bl, preg_fu1_fu2, by = "PRB_RTID")
+
+data.frame(table(preg_bl_fu1_fu2$PRB_RTID)) # no dupes
+
+preg_bl_fu1_fu2 %>%
+  arrange(PRB_STNU)
+```
+
+#left_join
+```{r}
+preg_bl_fu1_fu2_test <- left_join(preg_bl, preg_fu1_fu2, by = "PRB_RTID")
+
+data.frame(table(preg_bl_fu1_fu2_test$PRB_RTID)) # no dupes
+
+preg_bl_fu1_fu2_test %>%
+  arrange(PRB_STNU) %>%
+  filter(GROUP == 1)
+```
+
+```{r}
+process %>%
+  arrange(B_STNU) 
+```
+
+
+```{r}
+process_2009 <- process %>%
+  arrange(B_STNU) %>%
+  filter(C_YEAR == 2009)
+```
+
+```{r}
+process_2010 <- process %>%
+  arrange(B_STNU) %>%
+  filter(C_YEAR == 2010)
+```
+
